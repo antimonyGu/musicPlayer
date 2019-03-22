@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>音乐播放器</title>
+    <link rel="stylesheet" href="http://at.alicdn.com/t/font_881589_c0dwmabq02l.css">
+    <style>
+      /* reset.css */
+      * {
+        margin: 0;
+        padding: 0;
+      }
+
+
+      /* common.css */
+      body {
+        height: 100vh;
+      }
+
+      .cover {
+        position: absolute;
+        content: '';
+        display: block;
+        width: 100%;
+        height: 100%;
+        background: url(http://cloud.hunger-valley.com/17-9-22/87786461.jpg) center center no-repeat;
+        background-size: cover;
+        filter: blur(3px);
+      }
+
+      /* index.css */
+      .musicbox {
+        position: absolute;
+        left: 50%;
+        top: 40%;
+        transform: translate(-50%, -50%);
+        font-family: cursive;
+        font-size: 16px;
+        color: #f06d6a;
+        width: 340px;
+      }
+
+      .music-panel {
+        border: 1px solid #76dba3;
+        padding: 20px 20px 5px 20px;
+        box-shadow: 0px 2px 5px 0px rgba(0,0,0,.1), 0px 2px 10px 0px rgba(0,0,0,.05);
+        background-color: rgba(255,255,255,.9);
+      }
+
+      .musicbox .control {
+        margin-top: 20px;
+        font-size: 22px;
+        color: #ee8a87;
+        float: left;
+      }
+
+      .musicbox .control .iconfont {
+        margin-right: 12px;
+        cursor: pointer;
+      }
+
+      .musicbox .control .iconfont.disable {
+        opacity: 0.3;
+      }
+
+      .musicbox .info {
+        margin-left: 120px;
+      }
+
+      .musicbox .info .title {
+        font-size: 18px;
+      }
+
+      .musicbox .info .author {
+        font-size: 13px;
+      }
+
+      .musicbox .progress {
+        width: 260px;
+      }
+
+      .musicbox .progress .bar {
+        height: 3px;
+        margin-top: 5px;
+        background-color: rgba(0,0,0,.2);
+        cursor: pointer;
+      }
+
+      .musicbox .progress .progress-now {
+        height: 2px;
+        width: 0;
+        background-color: #ee8a87;
+        position: relative;
+      }
+
+      .musicbox .time {
+        text-align: right;
+      }
+
+      .musicbox:after,
+      .musicbox .music:after {
+        content: '';
+        display: block;
+        clear: both;
+      }
+
+      .musicbox .list {
+        list-style: none;
+      }
+
+      .musicbox .list>li {
+        position: relative;
+        padding: 4px 10px;
+        border: 1px solid rgba(255,255,255,.8);
+        border-top: none;
+        overflow: hidden;
+        cursor: pointer;
+        background-color: rgba(0,0,0,.8);
+      }
+
+      .musicbox .list>li:hover {
+        background-color: rgba(255,255,255,.5);
+      }
+
+      .musicbox .list>li.playing:before {
+        position: absolute;
+        top: 0;
+        left: 0;
+        content: '';
+        display: inline-block;
+        width: 8px;
+        height: 30px;
+        background: rgba(255,255,255,.8);
+      }
+
+    </style>
+  </head>
+  <body>
+    <!-- index.html -->
+    <div class="cover"></div>
+    <div class="musicbox">
+      <div class="music-panel">
+        <div class="music">
+          <div class="control">
+            <span class="back"><i class=" iconfont icon-back"></i></span>
+            <span class="play"><i class=" iconfont icon-play"></i></span>
+            <span class="forward"><i class=" iconfont icon-forward"></i></span>
+          </div>
+          <div class="info">
+            <div class="title">My Song</div>
+            <div class="author">Jay</div>
+          </div>
+        </div>
+        <div class="progress">
+          <div class="bar">
+            <div class="progress-total"></div>
+            <div class="progress-now"></div>
+          </div>
+          <div class="time">0:00</div>
+        </div>
+        <ul class="list">
+          <li>贰佰-玫瑰</li>
+          <li>IF YOU-Big Bang</li>
+        </ul>
+      </div>
+    </div>
+
+
+    <script>
+      // index.js
+
+      // function $(selector){
+      //   return document.querySelector(selector);
+      // }
+
+
+      // var musicList = [];
+      // var currentIndex = 0;
+      // var clock;
+      // var audio = new Audio();
+      // audio.autoplay = true;
+
+      // getMusicList(function(list){
+      //   musicList = list;
+      //   loadMusic(list[currentIndex]);
+      //   generateList(list);
+      // });
+
+      // audio.ontimeupdate = function(){
+      //   $('.musicbox .progress-now').style.width = (this.currentTime/this.duration)*100 + '%';
+      // };
+
+      // audio.onplay = function(){
+      //   clock =setInterval(function(){
+      //     var min = Math.floor(audio.currentTime/60);
+      //     var sec = Math.floor(audio.currentTime%60) + '';
+      //     sec = sec.length ===2? sec : '0' + sec;
+      //     $('.musicbox .time').innerText = min + ':' +sec;
+      //   }, 1000);
+      // };
+
+      // audio.onpause = function(){
+      //   clearInterval(clock);
+      // };
+
+      // audio.onended = function(){
+      //   concole.log('end');
+      //   currentIndex = (++currentIndex)%musicList.length;
+      //   loadMusic(musicList[currentIndex]);
+      // };
+
+      // $('.musicbox .play').onclick = function(){
+      //   if(audio.paused){
+      //     audio.play();
+      //     this.querySelector('.iconfont').classList.remove('icon-play');
+      //     this.querySelector('.iconfont').classList.add('icon-pause');
+      //   }else {
+      //     audio.pause();
+      //     this.querySelector('.iconfont').classList.add('icon-play');
+      //     this.querySelector('.iconfont').classList.remove('icon-pause');
+      //   }
+      // };
+
+      // $('.musicbox .forward').onclick = function(){
+      //   currentIndex = (++currentIndex)%musicList.length;
+      //   loadMusic(musicList[currentIndex]);
+      // };
+
+      // $('.musicbox .back').onclick = function(){
+      //   currentIndex = (musicList.length + --currentIndex)%musicList.length;
+      //   loadMusic(musicList[currentIndex]);
+      // };
+
+      // $('.music .bar').onclik = function(e){
+      //   console.log(e);
+      //   var percent = e.offsetX / parseInt(getComputedStyle(this).width);
+      //   console.log(percent);
+      //   audio.currentTime = audio.duration * percent;
+      // };
+
+      // function getMusicList(callback){
+      //   var xhr = new XMLHttpRequest();
+      //   xhr.open('Get', '/music.json', true);
+      //   xhr.onload = function(){
+      //     if((xhr.status >= 200 && xhr.status < 300) || xhr.status === 304){
+      //       callback(JSON.parse(this.responseText));
+      //     }else {
+      //       console.log('获取数据失败');
+      //     }
+      //   };
+      //   xhr.onerror = function(){
+      //     console.log('网络异常');
+      //   };
+      //   xhr.send();
+      // }
+
+      // function loadMusic(musicObj){
+      //   console.log('begin play', musicObj);
+      //   $('.musicbox .title').innerText = musicObj.title;
+      //   $('.musicbox .author').innerText = musicObj.author;
+      //   $('.cover').style.backgroundImage = 'url(' + musciObj.img + ')';
+      //   audio.src = musicObj.src;
+      // }
+
+
+      var musicList = [
+        {
+          src: 'http://cloud.hunger-valley.com/music/玫瑰.mp3',
+          title: '玫瑰',
+          author: '贰佰',
+          img: 'https://upload-images.jianshu.io/upload_images/3624093-d9678a0d2a897390.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240'
+        },
+        {
+          src: 'http://cloud.hunger-valley.com/music/ifyou.mp3',
+          title: 'IF YOU',
+          author: 'Big Bang',
+          img: 'https://upload-images.jianshu.io/upload_images/3624093-84598b108b24d414.png?imageMogr2/auto-orient/strip%7CimageView2/2/w/1240'
+        }
+
+      ];
+
+
+      var cover = document.querySelector('.cover');
+      var backBtn = document.querySelector('.musicbox .back');
+      var playBtn = document.querySelector('.musicbox .play');
+      var forwardBtn = document.querySelector('.musicbox .forward');
+      var titleNode = document.querySelector('.musicbox .title');
+      var authorNode = document.querySelector('.musicbox .author');
+      var timeNode = document.querySelector('.musicbox .time');
+      var progressBarNode = document.querySelector('.musicbox .progress .bar');
+      var progressNowNode = document.querySelector('.musicbox .progress-now');
+      var musicListContainer = document.querySelector('.musicbox .list');
+      var timer;
+      var musicList;
+
+      var music = new Audio();
+      music.autoplay = true;
+      var musicIndex = 0;
+
+      getMusic(function(list){
+        musicList = list;
+        setPlaylist(list);
+        loadMusic(list[musicIndex]);
+      });
+
+      playBtn.onclick = function() {
+        var icon = this.querySelector('.iconfont');
+        if(icon.classList.contains('icon-play')) {
+          music.play();
+        }else {
+          music.pause();
+        }
+        icon.classList.toggle('icon-play');
+        icon.classList.toggle('icon-pause');
+      };
+
+      forwardBtn.onclick = loadNextMusic;
+      backBtn.onclick = loadLastMusic;
+      music.onended = loadNextMusic;
+      music.shouldUpdate = true;
+
+      music.onplaying = function() {
+        timer = setInterval(function() {
+          updateProgress();
+        }, 1000);
+        console.log('play');
+      };
+
+      music.onpause = function() {
+        console.log('pause');
+        clearInterval(timer);
+      };
+
+      music.ontimeupdate = updateProgress;
+
+      progressBarNode.onclick = function(e) {
+        var percent = e.offsetX / parseInt(getComputedStyle(this).width);
+        music.currentTime = percent * music.duration;
+        progressNowNode.style.width = percent *100 + "%";
+      };
+
+      musicListContainer.onclick = function(e) {
+        if(e.target.tagName.toLowerCase() === 'li'){
+          for(var i = 0; i < this.children.length; i++){
+            if(this.children[i] === e.target){
+              musicIndex = i;
+            }
+          }
+          console.log(musicIndex);
+          loadMusic(musicList[musicIndex]);
+        }
+      };
+
+
+      function setPlaylist(musiclist) {
+        var container = document.createDocumentFragment();
+        musiclist.forEach(function(musicObj){
+          var node = document.createElement('li');
+          node.innerText = musicObj.author + '-' + musicObj.title;
+          console.log(node);
+          container.appendChild(node);
+        });
+        musicListContainer.appendChild(container);
+      }
+
+      function loadMusic(songObj) {
+        music.src = songObj.src;
+        titleNode.innerText = songObj.title;
+        authorNode.innerText = songObj.author;
+        cover.style.backgroundImage = 'url(' + songObj.img + ')';
+        for(var i = 0; i < musicListContainer.children.length; i++){
+          musicListContainer.children[i].classList.remove('playing');
+        }
+        musicListContainer.children[musicIndex].classList.add('playing');
+      }
+
+      function loadNextMusic() {
+        musicIndex++;
+        musicIndex = musicIndex % musicList.length;
+        loadMusic(musicList[musicIndex]);
+      }
+
+      function loadLastMusic() {
+        musicIndex--;
+        musicIndex = (musicIndex + musicList.length) % musicList.length;
+        loadMusic(musicList[musicIndex]);
+      }
+
+      function updateProgress() {
+        var percent = (music.currentTime / music.duration) * 100 + '%';
+        progressNowNode.style.width = percent;
+        var minutes = parseInt(music.currentTime / 60);
+        var seconds = parseInt(music.currentTime % 60) + '';
+        seconds = seconds.length == 2 ? seconds : '0' + seconds;
+        timeNode.innerText = minutes + ':' + seconds;
+      }
+
+      function getMusic(callback) {
+        var xhr = new XMLHttpRequest();
+        xhr.open('get', 'music.json', true);
+        xhr.send();
+        xhr.onload = function() {
+          if((xhr.status >= 200 && xhr.status < 300) || xhr.status == 304) {
+            callback(JSON.parse(xhr.responseText));
+          }
+        };
+      }
+
+    </script>
+  </body>
+</html>
